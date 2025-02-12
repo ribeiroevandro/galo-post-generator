@@ -19,7 +19,7 @@ const chromeExecPaths: ChromeExecutablePaths = {
     win32: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
     linux: '/usr/bin/google-chrome',
     darwin: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    lambda: '/var/task/.next/server/app/api/bin/chromium'
+    lambda: '/usr/bin/chromium-browser'
 };
 
 // Type definition for the environment
@@ -66,7 +66,7 @@ export async function getOptions(isDev?: boolean): Promise<ChromeOptions> {
         }
 
         return {
-            args: [...chrome.args, '--hide-scrollbars', '--disable-web-security', "--no-sandbox"],
+            args: [...chrome.args, '--hide-scrollbars', '--disable-web-security', "--no-sandbox", '--disable-setuid-sandbox'],
             ignoreHTTPSErrors: true,
             executablePath: await getExecutablePath(env),
             ignoreDefaultArgs: ['--disable-extensions'],
