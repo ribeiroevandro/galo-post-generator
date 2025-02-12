@@ -33,7 +33,9 @@ export async function POST(req: Request) {
             fileUrl = `${domain}/uploads/${fileNameNormalized}`;
         } else {
             // Ambiente de produção: utiliza o @vercel/blob
-            const blob = await put(file.name, file, { access: 'public' });
+            const blob = await put(file.name, file,
+                { access: 'public', token: process.env.BLOB_READ_WRITE_TOKEN }
+            );
             fileUrl = blob.url;
         }
 
