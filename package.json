@@ -6,9 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "preinstall": "yarn add puppeteer-core@8.0.0", 
-    "postinstall": "npx puppeteer browsers install chrome"
+    "lint": "next lint"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.2",
