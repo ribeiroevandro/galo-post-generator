@@ -12,6 +12,7 @@ export interface ChromeOptions {
     executablePath: string;
     headless: boolean;
     ignoreHTTPSErrors?: boolean;
+    ignoreDefaultArgs?: string[];
 }
 
 const chromeExecPaths: ChromeExecutablePaths = {
@@ -65,9 +66,10 @@ export async function getOptions(isDev?: boolean): Promise<ChromeOptions> {
         }
 
         return {
-            args: [...chrome.args, '--hide-scrollbars', '--disable-web-security'],
+            args: [...chrome.args, '--hide-scrollbars', '--disable-web-security', "--no-sandbox"],
             ignoreHTTPSErrors: true,
             executablePath: await getExecutablePath(env),
+            ignoreDefaultArgs: ['--disable-extensions'],
             headless: chrome.headless,
         };
     } catch (error) {
