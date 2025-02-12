@@ -24,7 +24,6 @@ export function UploadForm() {
         if (generatedImage) {
             URL.revokeObjectURL(generatedImage);
         }
-
         const formData = new FormData();
         if (fileInput.current && fileInput.current.files?.[0]) {
             formData.append("file", fileInput.current.files[0]);
@@ -35,24 +34,16 @@ export function UploadForm() {
         if (phoneInput.current) {
             formData.append("phone", phoneInput.current.value);
         }
-
-        // Inicia o loading e limpa imagem anterior.
         setLoading(true);
         setGeneratedImage("");
 
-        // Agora os dados serão enviados para o endpoint que gera a imagem
         fetch("/api/uploadImage", {
             method: "POST",
             body: formData,
         })
             .then((response) => response.json())
             .then((data) => {
-                console.log("data", data);
-
                 if (data.status === "success") {
-                    // Define a imagem gerada
-                    // Utilize data.image se sua API retornar a URL gerada, caso contrário, utilize um placeholder
-
                     fetch("/api/supporters", {
                         method: "POST",
                         body: JSON.stringify(data.newPost),
@@ -60,7 +51,6 @@ export function UploadForm() {
                         .then(async (response) => {
                             const blob = await response.blob()
                             const url = URL.createObjectURL(blob)
-                            console.log('url:', url);
                             setGeneratedImage(url)
                             setLoading(false)
                             setIsSubmitted(true)
