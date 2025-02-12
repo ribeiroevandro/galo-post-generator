@@ -66,11 +66,11 @@ export async function getOptions(isDev?: boolean): Promise<ChromeOptions> {
         }
 
         return {
-            args: [...chrome.args, '--hide-scrollbars', '--disable-web-security', "--no-sandbox", '--disable-setuid-sandbox'],
+            args: ['--hide-scrollbars', '--disable-web-security', "--no-sandbox", '--disable-setuid-sandbox'],
             ignoreHTTPSErrors: true,
             executablePath: await getExecutablePath(env),
             ignoreDefaultArgs: ['--disable-extensions'],
-            headless: chrome.headless,
+            headless: true,
         };
     } catch (error) {
         console.error('Error configuring Chrome options:', error);
