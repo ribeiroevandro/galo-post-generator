@@ -11,11 +11,12 @@ export async function POST(request: Request) {
     const res = await request.json();
     if (!res) {
       return NextResponse.json(
-        { error: 'Missing required query parameters: name, description, or techs' },
+        { error: 'Missing required query parameters: name, phone, or fileUrl' },
         { status: 400 }
       );
     }
 
+    // Obtém o HTML com base nos dados recebidos
     const html = getHtml({
       name: res.name,
       phone: res.phone,
@@ -23,12 +24,19 @@ export async function POST(request: Request) {
       isDev,
     });
 
+    // Se estiver no modo de debug do HTML, retorna o HTML diretamente
     if (isHtmlDebug) {
       return new Response(html, {
         headers: { 'Content-Type': 'text/html' },
       });
     }
 
+    // Em produção, evita a geração da screenshot e retorna a fileUrl diretamente
+    if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ fileUrl: res.fileUrl });
+    }
+
+    // Em desenvolvimento, gera a screenshot normalmente
     const file = await getScreenshot(html, isDev);
 
     return new Response(file, {
