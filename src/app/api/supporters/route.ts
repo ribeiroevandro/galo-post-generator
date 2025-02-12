@@ -30,7 +30,9 @@ export async function POST(request: Request) {
     }
 
     // Gera a screenshot, tanto em produção quanto em desenvolvimento
+    console.time('getScreenshot');
     const file = await getScreenshot(html, process.env.NODE_ENV !== 'production');
+    console.timeEnd('getScreenshot');
 
     return new Response(file, {
       status: 200,
