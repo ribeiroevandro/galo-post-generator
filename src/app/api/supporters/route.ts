@@ -1,5 +1,6 @@
-import { getScreenshot } from '@/utils/chromium';
-import { getHtml } from '@/utils/supportersTemplate';
+
+import { getScreenshot } from 'lib/chromium';
+import { getHtml } from 'lib/supportersTemplate';
 import { NextResponse } from 'next/server';
 
 const isHtmlDebug = process.env.OG_HTML_DEBUG === '1';
