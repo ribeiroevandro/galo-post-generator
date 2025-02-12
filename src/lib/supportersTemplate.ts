@@ -2,13 +2,9 @@ interface HtmlParams {
     name: string;
     phone: string;
     fileUrl: string;
-    isDev: boolean;
 }
 
-export function getHtml({ name, fileUrl, phone, isDev }: HtmlParams) {
-    const baseUrl = isDev
-        ? 'http://localhost:3000'
-        : 'https://banners-generator.vercel.app'
+export function getHtml({ name, fileUrl, phone }: HtmlParams) {
 
     return `
         <!DOCTYPE html>

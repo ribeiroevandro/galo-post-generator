@@ -3,6 +3,7 @@ import { getScreenshot } from 'lib/chromium';
 import { getHtml } from 'lib/supportersTemplate';
 import { NextResponse } from 'next/server';
 
+const isDev = !process.env.AWS_REGION
 const isHtmlDebug = process.env.OG_HTML_DEBUG === '1';
 
 export async function POST(request: Request) {
@@ -20,7 +21,6 @@ export async function POST(request: Request) {
       name: res.name,
       phone: res.phone,
       fileUrl: res.fileUrl,
-      isDev: process.env.NODE_ENV !== 'production',
     });
 
     // Se estiver no modo de debug do HTML, retorna o HTML diretamente
@@ -32,13 +32,14 @@ export async function POST(request: Request) {
 
     // Gera a screenshot, tanto em produção quanto em desenvolvimento
     console.time('getScreenshot');
-    const file = await getScreenshot(html, process.env.NODE_ENV !== 'production');
+    const file = await getScreenshot(html, isDev);
     console.timeEnd('getScreenshot');
 
     return new Response(file, {
       status: 200,
       headers: {
         'Content-Type': 'image/png',
+        'Cache-Control': 'public, immutable, no-transform, s-maxage=31536000, max-age=31536000'
       },
     });
   } catch (error) {
