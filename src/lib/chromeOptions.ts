@@ -36,7 +36,7 @@ const detectEnvironment = (): Environment => {
 const getExecutablePath = async (env: Environment): Promise<string> => {
     if (env.isLambda) {
         try {
-            return await chrome.executablePath
+            return chrome.puppeteer.executablePath();
         } catch (error) {
             console.error('Error getting Lambda Chrome path:', error);
             return chromeExecPaths.lambda;
