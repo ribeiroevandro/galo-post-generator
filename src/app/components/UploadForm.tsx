@@ -81,6 +81,7 @@ export function UploadForm() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        window.location.reload()
     }
 
     return (
