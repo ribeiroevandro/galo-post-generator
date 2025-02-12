@@ -5,20 +5,19 @@ import puppeteerCore, { type Browser as BrowserCore } from 'puppeteer-core';
 export async function getPage() {
     let browser: Browser | BrowserCore;
     if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
-        const executablePath = await chromium.executablePath('https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar')
+        const executablePath = await chromium.executablePath('https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar');
         browser = await puppeteer.launch({
             executablePath,
             args: chromium.args,
             headless: chromium.headless,
-            defaultViewport: chromium.defaultViewport
+            defaultViewport: chromium.defaultViewport,
         });
     } else {
         browser = await puppeteer.launch({
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
     }
-
     return browser;
 }
 
@@ -28,7 +27,9 @@ export async function getScreenshot(html: string, isDev: boolean) {
 
     try {
         await page.setViewport({ width: 900, height: 1600 });
-        await page.setContent(html, { waitUntil: 'load' });
+        // Define um timeout padrão e utiliza 'networkidle0' para aguardar carregamento completo da rede
+        page.setDefaultNavigationTimeout(30000);
+        await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 });
         await page.evaluateHandle('document.fonts.ready');
         const screenshot = await page.screenshot({ type: 'png' });
         return screenshot;
