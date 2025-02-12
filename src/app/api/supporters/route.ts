@@ -6,9 +6,9 @@ const isDev = process.env.NODE_ENV !== 'production';
 const isHtmlDebug = process.env.OG_HTML_DEBUG === '1';
 
 // POST handler
-export async function POST(request: Response) {
+export async function POST(request: Request) {
   try {
-    const res = await request.json()
+    const res = await request.json();
     if (!res) {
       return NextResponse.json(
         { error: 'Missing required query parameters: name, description, or techs' },
