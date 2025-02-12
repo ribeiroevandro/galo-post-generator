@@ -9,11 +9,20 @@ async function getPage(isDev: boolean): Promise<Page> {
     }
 
     const options = await getOptions(isDev)
-    const browser = await puppeteer.launch(options)
+    if (isDev) {
+        const browser = await puppeteer.launch(options)
+        _page = await browser.newPage()
+
+        return _page
+    }
+    const browser = await puppeteer.connect({
+        browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.BLESS_TOKEN}`,
+    })
 
     _page = await browser.newPage()
 
     return _page
+
 }
 
 export async function getScreenshot(

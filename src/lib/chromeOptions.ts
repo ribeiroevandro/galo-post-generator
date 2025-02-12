@@ -12,14 +12,14 @@ export interface ChromeOptions {
     executablePath: string;
     headless: boolean;
     ignoreHTTPSErrors?: boolean;
-    ignoreDefaultArgs?: string[];
+    ignoreDefaultArgs?: boolean;
 }
 
 const chromeExecPaths: ChromeExecutablePaths = {
     win32: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
     linux: '/usr/bin/google-chrome',
     darwin: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    lambda: '/usr/bin/chromium-browser'
+    lambda: '/var/task/.next/server/app/api/bin/chromium'
 };
 
 // Type definition for the environment
@@ -66,11 +66,10 @@ export async function getOptions(isDev?: boolean): Promise<ChromeOptions> {
         }
 
         return {
-            args: ['--hide-scrollbars', '--disable-web-security', "--no-sandbox", '--disable-setuid-sandbox'],
+            args: [...chrome.args, '--hide-scrollbars', '--disable-web-security'],
             ignoreHTTPSErrors: true,
             executablePath: await getExecutablePath(env),
-            ignoreDefaultArgs: ['--disable-extensions'],
-            headless: true,
+            headless: chrome.headless,
         };
     } catch (error) {
         console.error('Error configuring Chrome options:', error);
