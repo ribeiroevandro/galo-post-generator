@@ -50,27 +50,25 @@ export function UploadForm() {
                 console.log("data", data);
 
                 if (data.status === "success") {
-                    if (process.env.NODE_ENV === "production") {
-                        // Produção: utiliza diretamente a fileUrl retornada pelo @vercel/blob
-                        setGeneratedImage(data.newPost.fileUrl);
-                        setLoading(false);
-                        setIsSubmitted(true);
-                    } else {
-                        // Desenvolvimento: gera a imagem usando o endpoint supporters
-                        fetch("/api/supporters", {
-                            method: "POST",
-                            body: JSON.stringify(data.newPost),
-                        })
-                            .then(async (response) => {
+                    // Faz o POST em supporters em qualquer ambiente
+                    fetch("/api/supporters", {
+                        method: "POST",
+                        body: JSON.stringify(data.newPost),
+                    })
+                        .then(async (response) => {
+                            if (process.env.NODE_ENV === "production") {
+                                // Em produção, usa diretamente a fileUrl retornada
+                                setGeneratedImage(data.newPost.fileUrl);
+                            } else {
+                                // Em desenvolvimento, converte a resposta para blob e cria uma URL local
                                 const blob = await response.blob();
                                 const url = URL.createObjectURL(blob);
-                                console.log("url:", url);
                                 setGeneratedImage(url);
-                                setLoading(false);
-                                setIsSubmitted(true);
-                            })
-                            .catch((err) => console.error("Erro na requisição:", err));
-                    }
+                            }
+                            setLoading(false);
+                            setIsSubmitted(true);
+                        })
+                        .catch((err) => console.error("Erro na requisição:", err));
                 } else {
                     console.error("Erro no upload", data.error);
                 }
