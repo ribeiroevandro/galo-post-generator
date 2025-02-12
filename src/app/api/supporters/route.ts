@@ -2,10 +2,8 @@ import { getScreenshot } from '@/utils/chromium';
 import { getHtml } from '@/utils/supportersTemplate';
 import { NextResponse } from 'next/server';
 
-const isDev = process.env.NODE_ENV !== 'production';
 const isHtmlDebug = process.env.OG_HTML_DEBUG === '1';
 
-// POST handler
 export async function POST(request: Request) {
   try {
     const res = await request.json();
@@ -21,7 +19,7 @@ export async function POST(request: Request) {
       name: res.name,
       phone: res.phone,
       fileUrl: res.fileUrl,
-      isDev,
+      isDev: process.env.NODE_ENV !== 'production',
     });
 
     // Se estiver no modo de debug do HTML, retorna o HTML diretamente
@@ -31,13 +29,8 @@ export async function POST(request: Request) {
       });
     }
 
-    // Em produção, evita a geração da screenshot e retorna a fileUrl diretamente
-    if (process.env.NODE_ENV === 'production') {
-      return NextResponse.json({ fileUrl: res.fileUrl });
-    }
-
-    // Em desenvolvimento, gera a screenshot normalmente
-    const file = await getScreenshot(html, isDev);
+    // Gera a screenshot, tanto em produção quanto em desenvolvimento
+    const file = await getScreenshot(html, process.env.NODE_ENV !== 'production');
 
     return new Response(file, {
       status: 200,
