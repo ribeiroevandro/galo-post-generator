@@ -2,37 +2,48 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { put } from "@vercel/blob";
 
 export async function POST(req: Request) {
-
     try {
         const formData = await req.formData();
         const file = formData.get("file") as File;
         const name = formData.get("name") as string;
         const phone = formData.get("phone") as string;
 
-        // Normalize the name: trim spaces, convert to lowercase and replace spaces with dashes.
+        // Normaliza o nome: remove espaços, converte para minúsculas e substitui espaços por hífens.
         const normalizedName = name.trim().toLowerCase().replace(/\s+/g, "-");
 
-        // Preserve the original file extension.
+        // Preserva a extensão original do arquivo.
         const extension = path.extname(file.name);
         const fileNameNormalized = `${normalizedName}${extension}`;
-        const uploadPath = `./public/uploads/${fileNameNormalized}`;
 
         const arrayBuffer = await file.arrayBuffer();
         const buffer = new Uint8Array(arrayBuffer);
-        await fs.writeFile(uploadPath, buffer);
+
+        let fileUrl: string;
+
+        if (process.env.NODE_ENV === "development") {
+            // Ambiente local: salva na pasta public/uploads
+            const uploadPath = `./public/uploads/${fileNameNormalized}`;
+            await fs.writeFile(uploadPath, buffer);
+
+            // Utiliza variável de ambiente ou localhost para desenvolvimento
+            const domain = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+            fileUrl = `${domain}/uploads/${fileNameNormalized}`;
+        } else {
+            // Ambiente de produção: utiliza o @vercel/blob
+            const blob = await put(file.name, file, { access: 'public' });
+            fileUrl = blob.url;
+        }
+
         revalidatePath("/");
 
-        // Use an environment variable or default to localhost for development.
-        const domain = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
-        const fileUrl = `${domain}/uploads/${fileNameNormalized}`;
-
-        let newPost = {
+        const newPost = {
             name,
             phone,
-            fileUrl
-        }
+            fileUrl,
+        };
 
         return NextResponse.json({ status: "success", newPost });
     } catch (e) {
