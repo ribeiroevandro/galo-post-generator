@@ -11,9 +11,8 @@ export interface ChromeOptions {
     args: string[];
     executablePath: string;
     headless: boolean;
+    ignoreHTTPSErrors?: boolean;
 }
-
-
 
 const chromeExecPaths: ChromeExecutablePaths = {
     win32: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
@@ -37,7 +36,7 @@ const detectEnvironment = (): Environment => {
 const getExecutablePath = async (env: Environment): Promise<string> => {
     if (env.isLambda) {
         try {
-            return await chrome.executablePath;
+            return await chrome.executablePath
         } catch (error) {
             console.error('Error getting Lambda Chrome path:', error);
             return chromeExecPaths.lambda;
@@ -66,7 +65,8 @@ export async function getOptions(isDev?: boolean): Promise<ChromeOptions> {
         }
 
         return {
-            args: chrome.args,
+            args: [...chrome.args, '--hide-scrollbars', '--disable-web-security'],
+            ignoreHTTPSErrors: true,
             executablePath: await getExecutablePath(env),
             headless: chrome.headless,
         };
