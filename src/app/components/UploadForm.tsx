@@ -75,13 +75,21 @@ export function UploadForm() {
 
     function handleDownload() {
         if (!generatedImage) return;
-        const link = document.createElement("a");
-        link.href = generatedImage;
-        link.download = "downloaded-image.png"; // Specify the file name for download
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.location.reload()
+
+        const isIOS = /iP(ad|hone|od)/.test(navigator.userAgent);
+        if (isIOS) {
+            // No iOS, o atributo download não é suportado, então abrimos a imagem em nova aba
+            window.open(generatedImage, '_blank');
+            window.location.reload();
+        } else {
+            const link = document.createElement("a");
+            link.href = generatedImage;
+            link.download = "downloaded-image.png"; // Nome do arquivo para download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.location.reload();
+        }
     }
 
     return (
