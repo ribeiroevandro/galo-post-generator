@@ -1,11 +1,11 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 import { useRef, useState } from "react";
 import { Upload, Loader2, CheckCircle } from "lucide-react"
 import Image from "next/image";
+import { Button } from "./ui/button";
 
 
 export function UploadForm() {
@@ -50,23 +50,20 @@ export function UploadForm() {
                 console.log("data", data);
 
                 if (data.status === "success") {
-                    // Faz o POST em supporters em qualquer ambiente
+                    // Define a imagem gerada
+                    // Utilize data.image se sua API retornar a URL gerada, caso contrário, utilize um placeholder
+
                     fetch("/api/supporters", {
                         method: "POST",
                         body: JSON.stringify(data.newPost),
                     })
                         .then(async (response) => {
-                            if (process.env.NODE_ENV === "production") {
-                                // Em produção, usa diretamente a fileUrl retornada
-                                setGeneratedImage(data.newPost.fileUrl);
-                            } else {
-                                // Em desenvolvimento, converte a resposta para blob e cria uma URL local
-                                const blob = await response.blob();
-                                const url = URL.createObjectURL(blob);
-                                setGeneratedImage(url);
-                            }
-                            setLoading(false);
-                            setIsSubmitted(true);
+                            const blob = await response.blob()
+                            const url = URL.createObjectURL(blob)
+                            console.log('url:', url);
+                            setGeneratedImage(url)
+                            setLoading(false)
+                            setIsSubmitted(true)
                         })
                         .catch((err) => console.error("Erro na requisição:", err));
                 } else {
@@ -84,6 +81,7 @@ export function UploadForm() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        window.location.reload()
     }
 
     return (
